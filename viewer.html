@@ -1,0 +1,95 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>PDF</title>
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:#151515;color:#d4d4d4;color-scheme:dark;--rw:44px;--sbw:200px}
+body{margin:0;font:12px -apple-system,"SF Pro Text","SF Pro",system-ui,sans-serif}
+body.sb{--rw:calc(44px + var(--sbw))}
+#title{position:fixed;bottom:0;left:0;z-index:9;opacity:0;transition:opacity .15s;pointer-events:none;height:36px;line-height:36px;padding:0 12px;font-size:13px;border-top-right-radius:6px;max-width:40vw;background:#1E2020;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+nav{position:fixed;top:0;right:0;bottom:0;z-index:9;width:44px;padding:6px 0;background:#1E2020;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav .grow{flex:1}
+button{all:unset;display:grid;place-items:center;width:32px;height:32px;cursor:pointer;color:inherit;flex:none;border-radius:6px}
+button:hover{background:#2c2f2f}
+button:active,button.on{background:#363a3a}
+svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6}
+#ih img{width:20px;height:20px}
+input{all:unset;border-radius:6px;background:#151515;width:36px;height:22px;text-align:center;font:inherit}
+#pbox{position:fixed;top:8px;left:8px;border-radius:6px;box-shadow:0 2px 8px #0006;z-index:9;height:36px;padding:0 12px 0 7px;background:#1E2020;display:flex;align-items:center;gap:6px;font-size:13px}
+#pbox input{height:26px;width:44px}
+#n{color:#8a8a8a}
+.sep{width:18px;height:1px;background:#3a3d3d;margin:6px 0}
+aside{position:fixed;top:0;bottom:0;right:44px;width:var(--sbw);background:#0f0f0f;display:none;flex-direction:column;z-index:8}
+.sb aside{display:flex}
+#tabs{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:6px 8px}
+#tabs button{width:auto;height:26px;font:inherit;color:#8a8a8a}
+#tabs button.on{background:#1E2020;color:#e8e8e8}
+#grip{position:absolute;top:0;bottom:0;left:-3px;width:6px;cursor:ew-resize;z-index:1}
+#grip:hover,.drag #grip{background:#3a3d3d}
+.drag{cursor:ew-resize;user-select:none}
+#none{color:#6a6a6a;padding:8px}
+#thumbs,#outline{flex:1;overflow:auto;overscroll-behavior:contain;scrollbar-width:none;padding:8px}
+#thumbs{padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:12px}
+.t{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:#9a9a9a}
+.t div{width:calc(var(--sbw) - 80px);background:#fff;outline:2px solid transparent;outline-offset:2px}
+.t canvas{display:block;width:100%;height:100%}
+.t.on div{outline:3px solid #C3D3FF;outline-offset:3px}.t.on{color:#C3D3FF}
+#outline details,#outline .o{margin-left:12px}
+#outline>details,#outline>.o,summary .o{margin-left:0!important}
+summary{list-style:none;display:flex}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"";flex:none;width:12px;height:22px;background:currentColor;opacity:.6;clip-path:polygon(3px 8px,8px 11px,3px 14px)}
+details[open]>summary::before{clip-path:polygon(2px 9px,9px 9px,5.5px 14px)}
+.o{border-radius:6px;display:block;padding:4px 6px;cursor:pointer;line-height:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.o:hover{background:#2c2f2f}
+#outline>.o,#outline details>.o{padding-left:18px}
+#sc{position:fixed;inset:0 var(--rw) 0 0;overflow:auto;outline:none}
+#v{padding:44px 0 44px;width:max-content;min-width:100%;transform-origin:0 0}
+.p{position:relative;margin:0 auto 8px;background:#fff;contain:strict;content-visibility:auto;--scale-round-x:1px;--scale-round-y:1px}
+.p canvas{position:absolute;inset:0;width:100%;height:100%}
+[data-main-rotation="90"]{transform:rotate(90deg) translateY(-100%)}
+[data-main-rotation="180"]{transform:rotate(180deg) translate(-100%,-100%)}
+[data-main-rotation="270"]{transform:rotate(270deg) translateX(-100%)}
+.textLayer{position:absolute;top:0;left:0;overflow:clip;line-height:1;transform-origin:0 0;--min-font-size:1;--text-scale-factor:calc(var(--total-scale-factor)*var(--min-font-size));--min-font-size-inv:calc(1/var(--min-font-size))}
+.textLayer :is(span,br){color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0 0}
+.textLayer>:not(.markedContent),.textLayer .markedContent span:not(.markedContent){z-index:1;--font-height:0;font-size:calc(var(--text-scale-factor)*var(--font-height));--scale-x:1;--rotate:0deg;transform:rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv))}
+.textLayer .markedContent{display:contents}
+.textLayer ::selection{background:transparent} /* painted by .hl instead */
+.hl{position:absolute;top:0;left:0;transform-origin:0 0;pointer-events:none;mix-blend-mode:multiply} /* chromium: page multiplied by kHighlightColor, overlaps once */
+.hl i{position:absolute;background:#C3D3FF}
+/* while pinching: the (invisible) text layers are thousands of transformed spans; skip painting / hit-testing them */
+.pinch #v{pointer-events:none}
+.pinch .textLayer{content-visibility:hidden}
+body:has(nav:hover,aside:hover,#pbox:hover) #title{opacity:1}
+#e{text-align:center;margin-top:40vh}
+#e button{height:36px;width:auto;padding:0 12px;background:#1E2020}
+</style>
+<div id="title"></div>
+<div id="pbox"><input id="pg" value="1" aria-label="Page"><span id="n">–</span></div>
+<nav>
+  <button id="side" title="Pages & outline"><svg viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2.5"/><path d="M12 4v12"/></svg></button>
+  <i class="sep"></i>
+  <button id="in" title="Zoom in"><svg viewBox="0 0 20 20"><path d="M5 10h10M10 5v10"/></svg></button>
+  <input id="zm" aria-label="Zoom">
+  <button id="out" title="Zoom out"><svg viewBox="0 0 20 20"><path d="M5 10h10"/></svg></button>
+  <i class="sep"></i>
+  <button id="fit" title="Fit to width"><svg viewBox="0 0 20 20"><path d="M3 4v12M17 4v12M6 10h8M8 8l-2 2 2 2M12 8l2 2-2 2"/></svg></button>
+  <button id="rot" title="Rotate counterclockwise"><svg viewBox="0 0 20 20"><path d="M5 4v4h4"/><path d="M5.5 8A6 6 0 1 1 6 14.5"/></svg></button>
+  <i class="grow"></i>
+  <button id="dl" title="Download"><svg viewBox="0 0 20 20"><path d="M10 3v10M6 9l4 4 4-4M4 16.5h12"/></svg></button>
+  <button id="pr" title="Print"><svg viewBox="0 0 20 20"><path d="M6 7V3h8v4M6 14H3V7h14v7h-3M6 11h8v6H6z"/></svg></button>
+  <i class="sep"></i>
+  <button id="ih" title="Open iHatePDF"><img src="ihatepdf.svg" alt=""></button>
+</nav>
+<aside>
+  <i id="grip"></i>
+  <div id="tabs">
+    <button id="tp" class="on">Pages</button>
+    <button id="to">Outline</button>
+  </div>
+  <div id="thumbs"></div>
+  <div id="outline" hidden><div id="none">No outline</div></div>
+</aside>
+<main id="sc" tabindex="-1"><div id="v"></div></main>
+<script type="module" src="viewer.js"></script>

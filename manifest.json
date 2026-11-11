@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "PDF+",
+  "version": "1.0",
+  "description": "A fast, minimal PDF viewer that just opens PDFs.",
+  "minimum_chrome_version": "128",
+  "permissions": ["declarativeNetRequestWithHostAccess", "webNavigation"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js" },
+  "web_accessible_resources": [{ "resources": ["viewer.html"], "matches": ["<all_urls>"] }],
+  "content_security_policy": { "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'" },
+  "action": { "default_title": "PDF+", "default_icon": "icon.png" },
+  "icons": { "128": "icon.png" }
+}
