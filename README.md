@@ -27,8 +27,8 @@
 
 ## credits
 
-- **[PDF.js](https://github.com/mozilla/pdf.js)** by mozilla (apache 2.0, see `pdfjs/LICENSE`): pdf rendering
-- **[Chromium](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/pdf/)** PDF viewer (bsd-3-clause): text selection behaviour, ported to js
+- **[PDF.js](https://github.com/mozilla/pdf.js)** by mozilla (apache 2.0, see `pdfjs/LICENSE`): PDF rendering
+- **[Chromium](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/pdf/)** PDF viewer (BSD-3-clause): text selection behaviour, ported to JS
 
 ## license
 
