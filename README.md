@@ -15,7 +15,7 @@
 - opens every PDF (web + local) in a fast, minimal viewer
 - vim keys: `j` `k` scroll, `gg` `G`, `:` go to page
 - one-click [ihatepdf](https://www.ihatepdf.cv/)
-- stays snappy on 1000+ page PDfs
+- stays snappy on 1000+ page PDFs
 
 ## install
 
